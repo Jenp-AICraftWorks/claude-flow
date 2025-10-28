@@ -1,0 +1,65 @@
+name: Claude-Flow PR Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Claude-Flow
+        run: |
+          npm install -g claude-flow@alpha
+
+      - name: Run Agent Review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx claude-flow@alpha github pr-review \
+            --pr ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --agents code-review-swarm,security-manager,reviewer \
+            --memory-namespace aicraftworks/repos/${{ github.event.repository.name }} \
+            --auto-comment true
+
+      - name: Post Review Summary
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const reviewFile = '.claude-flow/review-summary.json';
+            
+            if (fs.existsSync(reviewFile)) {
+              const review = JSON.parse(fs.readFileSync(reviewFile, 'utf8'));
+              
+              const body = `## 🤖 Claude-Flow Agent Review
+              
+              **Status:** ${review.status}
+              **Agents:** ${review.agents.join(', ')}
+              
+              ### Findings
+              ${review.findings.map(f => `- ${f.severity}: ${f.message}`).join('\n')}
+              
+              ### Recommendations
+              ${review.recommendations.map(r => `- ${r}`).join('\n')}
+              `;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
