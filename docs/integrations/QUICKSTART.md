@@ -1,5 +1,17 @@
 # AICraftWorksOrg Claude-Flow Integration - Quick Start Guide
 
+## 🔒 Security First
+
+> [!CAUTION]
+> **MANDATORY SECURITY REQUIREMENT**: Claude-Flow contains powerful automation capabilities and must **ALWAYS** be executed within a GitHub Codespace or DevContainer environment. **NEVER** run Claude-Flow directly on your local machine.
+>
+> **Why?**
+> - Protects against malicious code in dependencies
+> - Isolates execution from your host system
+> - Provides easy cleanup and recovery
+> - Ensures consistent, reproducible environments
+> - Prevents unauthorized file system access
+
 ## Overview
 
 This guide provides everything you need to integrate Claude-Flow into the AICraftWorksOrg enterprise for AI-powered agent swarming across all repositories.
@@ -31,7 +43,42 @@ This guide provides everything you need to integrate Claude-Flow into the AICraf
 
 ## Quick Start (5 Minutes)
 
-### 1. Setup Central Repository
+> [!IMPORTANT]
+> **🔒 Security Requirement**: For maximum security, Claude-Flow must **ALWAYS** be run inside a GitHub Codespace or DevContainer. This isolates the execution environment and protects your local machine from any potential security risks in the codebase or dependencies.
+
+### 1. Setup Central Repository in CodeSpace (Recommended)
+
+**Option A: GitHub Codespace (Most Secure)**
+
+1. Navigate to https://github.com/Jenp-AICraftWorks/claude-flow
+2. Click the **Code** button (green)
+3. Select the **Codespaces** tab
+4. Click **Create codespace on [your-branch]**
+5. Wait for the environment to initialize (automatic npm install)
+6. Run setup in the Codespace terminal:
+   ```bash
+   ./scripts/aicraftworks/setup-central-repo.sh
+   ```
+
+**Option B: VSCode Dev Container (Local Isolation)**
+
+1. Install [VSCode](https://code.visualstudio.com/) and the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+2. Clone the repository:
+   ```bash
+   git clone https://github.com/Jenp-AICraftWorks/claude-flow
+   cd claude-flow
+   ```
+3. Open in VSCode and press `F1`
+4. Select **Dev Containers: Reopen in Container**
+5. Wait for container to build
+6. Run setup in the container terminal:
+   ```bash
+   ./scripts/aicraftworks/setup-central-repo.sh
+   ```
+
+**⚠️ Not Recommended: Local Installation**
+
+If you must run locally (not recommended for security):
 
 ```bash
 # Clone this repository
@@ -46,6 +93,13 @@ This creates:
 - `.aicraftworks/` - Configuration and scripts
 - `.swarm/` - Memory and session storage
 - Helper scripts for common operations
+
+**Security Benefits of CodeSpace**:
+- ✅ Isolated container environment
+- ✅ No local package installations
+- ✅ Automatic cleanup when stopped
+- ✅ Controlled file system access
+- ✅ Easy to recreate if compromised
 
 ### 2. Test Installation
 

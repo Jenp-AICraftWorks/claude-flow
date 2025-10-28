@@ -1,5 +1,18 @@
 # AICraftWorksOrg Enterprise Integration Guide
 
+## 🔒 Security Requirements
+
+> [!CAUTION]
+> **MANDATORY**: All Claude-Flow operations must be performed within GitHub Codespaces or DevContainer environments. This is a critical security requirement to protect AICraftWorksOrg infrastructure and data.
+
+### Why Codespaces?
+
+1. **Isolation**: Complete separation from local machines
+2. **Auditability**: All actions logged in GitHub
+3. **Disposability**: Easy to destroy and recreate
+4. **Consistency**: Same environment for all team members
+5. **Security**: No local installation of potentially risky dependencies
+
 ## Overview
 
 This guide outlines the integration of Claude-Flow into the AICraftWorksOrg Central Repository to enable enterprise-wide agent swarming, distributed memory, and collaborative development across multiple repositories.
@@ -99,14 +112,27 @@ This guide outlines the integration of Claude-Flow into the AICraftWorksOrg Cent
 
 ## Integration Strategy
 
-### Phase 1: Central Repository Setup
+### Phase 1: Central Repository Setup (In CodeSpace)
 
-1. **Initialize Claude-Flow in Central Repo**
+> [!IMPORTANT]
+> **All commands below must be executed inside a GitHub Codespace or DevContainer.**
+
+1. **Open Central Repo in CodeSpace**
+
 ```bash
-# Clone and setup central repository
+# Navigate to https://github.com/AICraftWorksOrg/central-repository
+# Click Code > Codespaces > Create codespace
+# Wait for automatic initialization
+
+# Or clone and open in DevContainer:
 git clone https://github.com/AICraftWorksOrg/central-repository
 cd central-repository
+# In VSCode: F1 > Dev Containers: Reopen in Container
+```
 
+2. **Initialize Claude-Flow (In CodeSpace Terminal)**
+
+```bash
 # Install Claude-Flow
 npm install -g claude-flow@alpha
 
@@ -114,14 +140,14 @@ npm install -g claude-flow@alpha
 npx claude-flow@alpha init --force --project-name "AICraftWorks-Central"
 ```
 
-2. **Configure Org-Wide Settings**
+3. **Configure Org-Wide Settings**
 ```bash
 # Create central configuration directory
 mkdir -p .aicraftworks/claude-flow
 cp config/templates/enterprise-config.yml .aicraftworks/claude-flow/
 ```
 
-3. **Setup Memory Systems**
+4. **Setup Memory Systems**
 ```bash
 # Initialize AgentDB for high-performance vector search
 npm install agentdb@1.3.9

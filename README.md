@@ -11,6 +11,20 @@
 
 </div>
 
+---
+
+> [!CAUTION]
+> **🔒 SECURITY REQUIREMENT FOR AICRAFTWORKSORG**
+> 
+> This repository **MUST** be opened and run exclusively in GitHub Codespaces or DevContainers. 
+> **DO NOT clone or run this code directly on your local machine.**
+> 
+> [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Jenp-AICraftWorks/claude-flow)
+> 
+> **Why?** Running powerful AI orchestration tools requires isolation to protect your machine from potential security risks. See [Security Guidelines](./docs/integrations/SECURITY.md) for details.
+
+---
+
 ## 🌟 **Overview**
 
 **Claude-Flow v2.7** is an enterprise-grade AI orchestration platform that combines **hive-mind swarm intelligence**, **persistent memory**, and **100+ advanced MCP tools** to revolutionize AI-powered development workflows.
