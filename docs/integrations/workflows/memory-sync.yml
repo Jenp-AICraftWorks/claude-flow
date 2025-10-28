@@ -1,0 +1,54 @@
+name: Memory Sync
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:
+
+jobs:
+  sync-memory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Claude-Flow
+        run: |
+          npm install -g claude-flow@alpha
+
+      - name: Sync Repository Memories
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # Sync all repo memories to shared namespace
+          for repo in user-service payment-service api-gateway frontend-web frontend-mobile; do
+            echo "Syncing memory for $repo..."
+            npx claude-flow@alpha memory sync \
+              --from "aicraftworks/repos/$repo" \
+              --to "aicraftworks/shared" \
+              --pattern "*" || true
+          done
+
+      - name: Consolidate Learnings
+        run: |
+          npx claude-flow@alpha memory consolidate \
+            --namespace aicraftworks/shared \
+            --deduplicate true \
+            --agentdb
+
+      - name: Generate Memory Report
+        run: |
+          mkdir -p .aicraftworks/reports
+          npx claude-flow@alpha memory stats \
+            --namespace aicraftworks/shared \
+            --output .aicraftworks/reports/memory-sync-$(date +%Y%m%d).json
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: memory-sync-report
+          path: .aicraftworks/reports/memory-sync-*.json

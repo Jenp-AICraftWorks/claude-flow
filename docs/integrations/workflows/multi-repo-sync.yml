@@ -1,0 +1,49 @@
+name: Multi-Repo Sync
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      target_repos:
+        description: 'Comma-separated list of target repositories'
+        required: true
+        default: 'user-service,payment-service,api-gateway'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Claude-Flow
+        run: |
+          npm install -g claude-flow@alpha
+
+      - name: Synchronize Repositories
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TARGET_REPOS="${{ github.event.inputs.target_repos || 'user-service,payment-service,api-gateway' }}"
+          
+          npx claude-flow@alpha github multi-repo sync \
+            --source ${{ github.repository }} \
+            --targets "$TARGET_REPOS" \
+            --agent multi-repo-swarm \
+            --strategy selective \
+            --dry-run false
+
+      - name: Update Memory
+        run: |
+          npx claude-flow@alpha memory store \
+            "last_sync" \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --namespace aicraftworks/central \
+            --metadata '{"event":"multi-repo-sync","repos":"${{ github.event.inputs.target_repos }}"}'
